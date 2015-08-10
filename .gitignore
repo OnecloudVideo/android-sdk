@@ -25,3 +25,7 @@ proguard/
 
 # Log Files
 *.log
+/org.eclipse.jdt.core.prefs
+.project
+.classpath
+.settings/

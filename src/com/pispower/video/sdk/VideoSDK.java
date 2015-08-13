@@ -1,5 +1,6 @@
 package com.pispower.video.sdk;
 
+import com.pispower.video.sdk.advertisement.AdvertisementService;
 import com.pispower.video.sdk.catalog.CatalogService;
 import com.pispower.video.sdk.multipart.MultipartService;
 import com.pispower.video.sdk.video.VideoService;
@@ -16,5 +17,9 @@ public class VideoSDK {
 
 	public static MultipartService getMultipartService() {
 		return new MultipartService();
+	}
+	
+	public static AdvertisementService getAdvertisementService() {
+		return new AdvertisementService();
 	}
 }

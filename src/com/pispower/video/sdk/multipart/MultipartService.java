@@ -4,6 +4,12 @@ import java.io.File;
 
 import android.os.Handler;
 
+/**
+ * 
+ * CatalogService manage all opertaions of multipart uploading.
+ * @author kinghai
+ *
+ */
 public class MultipartService {
 
 	public void upload(File uploadFile, File tempDir,

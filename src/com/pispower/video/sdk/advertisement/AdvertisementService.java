@@ -3,6 +3,12 @@ package com.pispower.video.sdk.advertisement;
 import java.io.File;
 import java.util.List;
 
+/**
+ * 
+ * CatalogService manage all opertaions of advertisement.
+ * @author kinghai
+ *
+ */
 public class AdvertisementService {
 
 	public Advertisement upload(File file, String name) {

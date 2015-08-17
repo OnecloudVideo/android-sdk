@@ -16,6 +16,12 @@ import com.pispower.video.sdk.advertising.UpdateTrait;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 
+ * CatalogService manage all opertaions of advertising. advertising determining the way to play advertisement.
+ * @author kinghai
+ *
+ */
 public class AdvertisingService {
     public AdvertisingService() {
     }

@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidator;
 import com.pispower.video.sdk.util.QueryString;
 
 class DeleteTrait {
@@ -37,7 +36,6 @@ class DeleteTrait {
 		QueryString qs = new QueryString();
 		qs.addParam("id", id);
 
-		return new HTTPJSONResponseValidator().valid(client.post(
-				"/ad/delete.api", qs));
+		return client.post("/ad/delete.api", qs);
 	}
 }

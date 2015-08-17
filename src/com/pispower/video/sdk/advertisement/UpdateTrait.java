@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidator;
 import com.pispower.video.sdk.util.QueryString;
 
 class UpdateTrait {
@@ -41,7 +40,6 @@ class UpdateTrait {
 		qs.addParam("id", id);
 		qs.addParam("name", name);
 
-		return new HTTPJSONResponseValidator().valid(client.post(
-				"/ad/update.api", qs));
+		return client.post("/ad/update.api", qs);
 	}
 }

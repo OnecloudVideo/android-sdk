@@ -10,19 +10,19 @@ import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidator;
 import com.pispower.video.sdk.util.QueryString;
 
 class GetTrait {
 
 	private static final String Tag = GetTrait.class.getName();
-	
+
 	public Advertisement get(String id) {
 		try {
 			JSONObject jo = getJsonObject(id);
 			return new AdvertisementCreator().create(jo);
-			
-		} catch (ParseException | JSONException | IOException | HTTPJSONResponseValidException e) {
+
+		} catch (ParseException | JSONException | IOException
+				| HTTPJSONResponseValidException e) {
 			Log.i(Tag, e.getMessage());
 			return null;
 		}
@@ -36,16 +36,14 @@ class GetTrait {
 	 * @throws JSONException
 	 * @throws ParseException
 	 * @throws IOException
-	 * @throws HTTPJSONResponseValidException 
+	 * @throws HTTPJSONResponseValidException
 	 */
 	private JSONObject getJsonObject(String id) throws JSONException,
 			ParseException, IOException, HTTPJSONResponseValidException {
 		BaseClient client = new BaseClient();
 		QueryString queryString = new QueryString();
 		queryString.addParam("id", id);
-		
-		JSONObject json = client.get("/ad/get.api", queryString);
-		
-		return new HTTPJSONResponseValidator().valid(json);
+
+		return client.get("/ad/get.api", queryString);
 	}
 }

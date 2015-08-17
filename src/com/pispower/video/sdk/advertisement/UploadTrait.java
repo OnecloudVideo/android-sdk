@@ -11,7 +11,6 @@ import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidator;
 import com.pispower.video.sdk.util.QueryString;
 
 class UploadTrait {
@@ -42,7 +41,6 @@ class UploadTrait {
 			qs.addParam("name", name);
 		}
 
-		return new HTTPJSONResponseValidator().valid(client.postFile(
-				"/ad/upload.api", qs, file));
+		return client.postFile("/ad/upload.api", qs, file);
 	}
 }

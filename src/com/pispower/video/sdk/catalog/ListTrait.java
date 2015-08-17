@@ -12,6 +12,7 @@ import android.net.ParseException;
 import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.util.QueryString;
 
 class ListTrait {
@@ -57,9 +58,10 @@ class ListTrait {
 	 * @throws ParseException
 	 * @throws IOException
 	 * @throws JSONException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	private JSONArray listJSON() throws ParseException, IOException,
-			JSONException {
+			JSONException, HTTPJSONResponseValidException {
 		BaseClient client = this.getBaseClient();
 		final QueryString queryString = new QueryString();
 		final JSONObject json = client.get("/catalog/list.api", queryString);

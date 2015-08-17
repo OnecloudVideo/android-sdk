@@ -9,6 +9,7 @@ import android.net.ParseException;
 import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.util.QueryString;
 
 class GetTrait {
@@ -26,7 +27,7 @@ class GetTrait {
 			info.setHoldVideoNums(jo.getString("videoNumber"));
 			info.setLastModifiedTime(jo.getString("lastModifiedTime"));
 			
-		} catch (ParseException | JSONException | IOException e) {
+		} catch (ParseException | JSONException | IOException | HTTPJSONResponseValidException e) {
 			Log.i(Tag, e.getMessage());
 		}
 		
@@ -41,9 +42,10 @@ class GetTrait {
 	 * @throws JSONException
 	 * @throws ParseException
 	 * @throws IOException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	private JSONObject getCatalog(String catalogId) throws JSONException,
-			ParseException, IOException {
+			ParseException, IOException, HTTPJSONResponseValidException {
 		BaseClient client = new BaseClient();
 		QueryString queryString = new QueryString();
 		queryString.addParam("catalogId", catalogId);

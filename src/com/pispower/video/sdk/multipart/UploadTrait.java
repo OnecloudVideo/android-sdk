@@ -24,6 +24,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.upload.UploadStatus;
 import com.pispower.video.sdk.util.FileUtil;
 import com.pispower.video.sdk.util.MD5;
@@ -248,9 +249,10 @@ class UploadTrait {
 	 * @throws JSONException
 	 * @throws ParseException
 	 * @throws NoSuchAlgorithmException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	private String initMultipartUpload() throws ParseException, JSONException,
-			IOException, NoSuchAlgorithmException {
+			IOException, NoSuchAlgorithmException, HTTPJSONResponseValidException {
 		Log.d(TAG, "initing multipart upload....");
 		final QueryString queryString = new QueryString();
 		queryString.addParam("fileName", file.getName());

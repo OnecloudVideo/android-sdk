@@ -93,9 +93,10 @@ public class BaseClient {
 	 * @throws IOException
 	 * @throws JSONException
 	 * @throws ParseException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	public JSONObject get(final String apiContext, final QueryString queryString)
-			throws IOException, ParseException, JSONException {
+			throws IOException, JSONException, HTTPJSONResponseValidException {
 		return excute(HttpGet.METHOD_NAME, apiContext, queryString);
 	}
 
@@ -109,10 +110,11 @@ public class BaseClient {
 	 * @throws IOException
 	 * @throws JSONException
 	 * @throws ParseException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	public JSONObject post(final String apiContext,
-			final QueryString queryString) throws IOException, ParseException,
-			JSONException {
+			final QueryString queryString) throws IOException,
+			JSONException, HTTPJSONResponseValidException {
 		return excute(HttpPost.METHOD_NAME, apiContext, queryString);
 	}
 
@@ -127,11 +129,12 @@ public class BaseClient {
 	 * @return
 	 * @throws IOException
 	 * @throws JSONException
+	 * @throws HTTPJSONResponseValidException 
 	 * @throws ParseException
 	 */
 	private JSONObject excute(final String method, final String apiContext,
-			final QueryString queryString) throws IOException, ParseException,
-			JSONException {
+			final QueryString queryString) throws IOException,
+			JSONException, HTTPJSONResponseValidException {
 		final URI context = addRequestParams(apiContext, queryString);
 		final HttpClient httpClient = this.getDefaultHttpClient();
 		HttpRequestBase httpGet = getHttpRequestBase(method, context);
@@ -144,7 +147,8 @@ public class BaseClient {
 		Log.i(TAG, "Get response : " + jsonObject);
 		
 		httpClient.getConnectionManager().shutdown();
-		return jsonObject;
+		
+		return new HTTPJSONResponseValidator().valid(jsonObject);
 	}
 
 	private HttpRequestBase getHttpRequestBase(String methodName, final URI uri) {

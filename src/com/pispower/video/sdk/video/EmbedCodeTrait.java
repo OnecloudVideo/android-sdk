@@ -14,6 +14,7 @@ import android.net.ParseException;
 import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.util.QueryString;
 
 class EmbedCodeTrait {
@@ -29,9 +30,11 @@ class EmbedCodeTrait {
 	 * @throws JSONException
 	 * @throws ParseException
 	 * @throws IOException
+	 * @throws org.apache.http.ParseException 
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	public Map<String, String> getVideoEmbedCode(String videoId, String clarity)
-			throws JSONException, ParseException, IOException {
+			throws JSONException, ParseException, IOException, org.apache.http.ParseException, HTTPJSONResponseValidException {
 		Map<String, String> clarityUrlMap = new HashMap<String, String>();
 
 		BaseClient client = new BaseClient();

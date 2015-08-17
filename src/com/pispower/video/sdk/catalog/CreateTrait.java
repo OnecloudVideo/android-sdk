@@ -11,6 +11,7 @@ import android.net.ParseException;
 import android.util.Log;
 
 import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.util.QueryString;
 
 class CreateTrait {
@@ -50,9 +51,10 @@ class CreateTrait {
 	 * @throws ParseException
 	 * @throws JSONException
 	 * @throws IOException
+	 * @throws HTTPJSONResponseValidException 
 	 */
 	private JSONObject createCatalog(String name) throws ParseException,
-			JSONException, IOException {
+			JSONException, IOException, HTTPJSONResponseValidException {
 		BaseClient client = new BaseClient();
 		QueryString qs = new QueryString();
 		qs.addParam("name", name);

@@ -23,6 +23,7 @@ import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.pispower.video.sdk.core.AbstractTrait;
 import com.pispower.video.sdk.net.BaseClient;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.upload.UploadStatus;
@@ -30,7 +31,7 @@ import com.pispower.video.sdk.util.FileUtil;
 import com.pispower.video.sdk.util.MD5;
 import com.pispower.video.sdk.util.QueryString;
 
-class UploadTrait {
+class UploadTrait extends AbstractTrait {
 
 	private static final String TAG = "MultipartUploadClient";
 
@@ -57,12 +58,14 @@ class UploadTrait {
 	 * @param tempDir
 	 * @param handler
 	 */
-	private UploadTrait(File uploadFile, File tempDir, Handler handler) {
-		super();
+	private UploadTrait(String accessKey, String accessSecret, File uploadFile, File tempDir, Handler handler) {
+		super(accessKey, accessSecret);
 		this.file = uploadFile;
 		this.tmpDir = tempDir;
 		this.handler = handler;
 		this.client = new BaseClient(this.handler);
+		this.client.setAccessKey(accessKey);
+		this.client.setAccessSecret(accessSecret);
 	}
 
 	/**
@@ -72,10 +75,16 @@ class UploadTrait {
 	 * @param tempDir
 	 * @param handler
 	 */
-	public UploadTrait(File uploadFile, File tempDir,
+	public UploadTrait(String accessKey, String accessSecret, File uploadFile, File tempDir,
 			Handler handler, String curCatalogId) {
-		this(uploadFile, tempDir, handler);
+		this(accessKey, accessSecret, uploadFile, tempDir, handler);
+		
 		this.curCatalogId = curCatalogId;
+	}
+
+	public UploadTrait(String accessKey, String accessSecret,
+			MultipartUploadRequest req) {
+		this(accessKey, accessSecret, req.getUploadFile(), req.getTempDir(), req.getHandler(), req.getCurCatalogId());
 	}
 
 	private void sendUploadStartMessage(int partNums) {

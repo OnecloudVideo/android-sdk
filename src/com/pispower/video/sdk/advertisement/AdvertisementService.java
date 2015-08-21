@@ -1,7 +1,14 @@
 package com.pispower.video.sdk.advertisement;
 
-import java.io.File;
 import java.util.List;
+
+import com.pispower.video.sdk.advertisement.request.AdvertisementDeleteRequest;
+import com.pispower.video.sdk.advertisement.request.AdvertisementGetRequest;
+import com.pispower.video.sdk.advertisement.request.AdvertisementListRequest;
+import com.pispower.video.sdk.advertisement.request.AdvertisementUpdateRequest;
+import com.pispower.video.sdk.advertisement.request.AdvertisementUploadRequest;
+import com.pispower.video.sdk.core.AccessPropertiesConfig;
+import com.pispower.video.sdk.core.VideoSDKException;
 
 /**
  * 
@@ -9,25 +16,29 @@ import java.util.List;
  * @author kinghai
  *
  */
-public class AdvertisementService {
+public class AdvertisementService extends AccessPropertiesConfig{
 
-	public Advertisement upload(File file, String name) {
-		return new UploadTrait().upload(file, name);
+	public AdvertisementService(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
 	}
 
-	public Advertisement get(String id) {
-		return new GetTrait().get(id);
+	public Advertisement upload(AdvertisementUploadRequest req) {
+		return new UploadTrait(getAccessKey(), getAccessSecret()).upload(req.file, req.name);
 	}
 
-	public List<Advertisement> list(String nameLike, int page, int maxResult) {
-		return new ListTrait().list(nameLike, page, maxResult);
+	public Advertisement get(AdvertisementGetRequest req) throws VideoSDKException {
+		return new GetTrait(getAccessKey(), getAccessSecret()).get(req);
 	}
 
-	public boolean update(String id, String name) {
-		return new UpdateTrait().update(id, name);
+	public List<Advertisement> list(AdvertisementListRequest req) throws VideoSDKException {
+		return new ListTrait(getAccessKey(), getAccessSecret()).list(req);
 	}
 
-	public boolean delete(String id) {
-		return new DeleteTrait().delete(id);
+	public String update(AdvertisementUpdateRequest req) throws VideoSDKException {
+		return new UpdateTrait(getAccessKey(), getAccessSecret()).update(req);
+	}
+
+	public String delete(AdvertisementDeleteRequest req) throws VideoSDKException {
+		return new DeleteTrait(getAccessKey(), getAccessSecret()).delete(req);
 	}
 }

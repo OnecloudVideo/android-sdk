@@ -1,41 +1,26 @@
 package com.pispower.video.sdk.advertisement;
 
-import java.io.IOException;
-
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import com.pispower.video.sdk.advertisement.request.AdvertisementDeleteRequest;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 
-import com.pispower.video.sdk.net.BaseClient;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
+class DeleteTrait extends AbstractTrait {
 
-class DeleteTrait {
-
-	private static final String Tag = DeleteTrait.class.getName();
-
-	public boolean delete(String id) {
-
-		try {
-			getResponseJSON(id);
-			return true;
-		} catch (ParseException | HTTPJSONResponseValidException | IOException
-				| JSONException e) {
-
-			Log.e(Tag, "delete fail", e);
-			return false;
-		}
+	public DeleteTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
 	}
 
-	private JSONObject getResponseJSON(String id) throws ParseException,
-			HTTPJSONResponseValidException, IOException, JSONException {
-		BaseClient client = new BaseClient();
-
-		QueryString qs = new QueryString();
-		qs.addParam("id", id);
-
-		return client.post("/ad/delete.api", qs);
+	public String delete(AdvertisementDeleteRequest req) throws VideoSDKException {
+		return (String) postHTTP("/ad/delete.api", req, new TraitResponseHandler() {
+			
+			@Override
+			public Object handle(JSONObject jo) throws JSONException, VideoSDKException {
+				return jo.getString("message");
+			}
+		});
 	}
 }

@@ -46,41 +46,55 @@ import android.util.Log;
 import com.pispower.video.sdk.net.SimpleMultipartEntity.ProcessListener;
 import com.pispower.video.sdk.upload.UploadStatus;
 import com.pispower.video.sdk.util.MD5;
-import com.pispower.video.sdk.util.PropertiesUtil;
 import com.pispower.video.sdk.util.QueryString;
 
 public class BaseClient {
-	
+
 	private Handler uploadingHander = null;
 
 	private static final String TAG = BaseClient.class.getName();
 	/**
 	 * 视频平台的地址。
 	 */
-	private final String apiHost = PropertiesUtil.getHostProperty();
+	private final String apiHost = "http://video.pispower.com";
 
 	/**
 	 * 视频平台提供的 accessKey，该字段会通过公网传输。
 	 * 
 	 * 请从ovp 开发者支持/Restful API页面获取
 	 */
-	private final String accessKey = PropertiesUtil.getAccessKeyProperty();
+	private String accessKey;
+
+	public String getAccessKey() {
+		return accessKey;
+	}
+
+	public void setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
+	}
+
+	public String getAccessSecret() {
+		return accessSecret;
+	}
+
+	public void setAccessSecret(String accessSecret) {
+		this.accessSecret = accessSecret;
+	}
 
 	/**
 	 * 视频平台提供的 accessSecret， 该字段用来生成数字签名，注意保密，并且不要通过公网传输。
 	 * 
 	 * 请从ovp 开发者支持/Restful API页面获取
 	 */
-	private final String accessSecret = PropertiesUtil.getAccessSecretProperty();
-
-	public BaseClient() {
-//		Log.d(TAG, "Init baseclient");
-//		Log.d(TAG, "Init baseclient with ovp:" + apiHost);
-//		Log.d(TAG, "Init baseclient with accessKey:" + accessKey);
-	}
+	private String accessSecret;
 
 	public BaseClient(Handler uploadingHander) {
-         this.uploadingHander=uploadingHander;
+		this.uploadingHander = uploadingHander;
+	}
+
+	public BaseClient(String accessKey2, String accessSecret2) {
+		this.accessKey = accessKey2;
+		this.accessSecret = accessSecret2;
 	}
 
 	/**
@@ -93,7 +107,7 @@ public class BaseClient {
 	 * @throws IOException
 	 * @throws JSONException
 	 * @throws ParseException
-	 * @throws HTTPJSONResponseValidException 
+	 * @throws HTTPJSONResponseValidException
 	 */
 	public JSONObject get(final String apiContext, final QueryString queryString)
 			throws IOException, JSONException, HTTPJSONResponseValidException {
@@ -110,11 +124,11 @@ public class BaseClient {
 	 * @throws IOException
 	 * @throws JSONException
 	 * @throws ParseException
-	 * @throws HTTPJSONResponseValidException 
+	 * @throws HTTPJSONResponseValidException
 	 */
 	public JSONObject post(final String apiContext,
-			final QueryString queryString) throws IOException,
-			JSONException, HTTPJSONResponseValidException {
+			final QueryString queryString) throws IOException, JSONException,
+			HTTPJSONResponseValidException {
 		return excute(HttpPost.METHOD_NAME, apiContext, queryString);
 	}
 
@@ -129,25 +143,27 @@ public class BaseClient {
 	 * @return
 	 * @throws IOException
 	 * @throws JSONException
-	 * @throws HTTPJSONResponseValidException 
+	 * @throws HTTPJSONResponseValidException
 	 * @throws ParseException
 	 */
 	private JSONObject excute(final String method, final String apiContext,
-			final QueryString queryString) throws IOException,
-			JSONException, HTTPJSONResponseValidException {
+			final QueryString queryString) throws IOException, JSONException,
+			HTTPJSONResponseValidException {
 		final URI context = addRequestParams(apiContext, queryString);
 		final HttpClient httpClient = this.getDefaultHttpClient();
 		HttpRequestBase httpGet = getHttpRequestBase(method, context);
 		httpGet.addHeader("Accept", "application/json");
 		httpGet.setHeader("Content-Type", "application/json");
+
+		Log.d(TAG, "send request : " + context);
 		
 		HttpResponse httpResponse = httpClient.execute(httpGet);
-		
+
 		JSONObject jsonObject = getJSONFromResponse(httpResponse);
-		Log.i(TAG, "Get response : " + jsonObject);
-		
+		Log.d(TAG, "get response : " + jsonObject);
+
 		httpClient.getConnectionManager().shutdown();
-		
+
 		return new HTTPJSONResponseValidator().valid(jsonObject);
 	}
 
@@ -264,25 +280,25 @@ public class BaseClient {
 		QueryString addQueryString = addAditionParameters(queryString);
 		final HttpPost httppost = new HttpPost(context);
 		SimpleMultipartEntity simpleMultipartEntity;
-		if(uploadingHander!=null){
-			 simpleMultipartEntity = new SimpleMultipartEntity(
+		if (uploadingHander != null) {
+			simpleMultipartEntity = new SimpleMultipartEntity(
 					new ProcessListener() {
 						@Override
 						public void currentSendBytes(long bytes) {
-	                        	Message message = uploadingHander.obtainMessage();
-	                       		message.what = UploadStatus.UPLOADING.ordinal();
-	                       		Bundle bundle = new Bundle();
-	                       		bundle.putLong("currentValue", bytes);
-	                       		message.setData(bundle);
-	                       		uploadingHander.sendMessage(message);
+							Message message = uploadingHander.obtainMessage();
+							message.what = UploadStatus.UPLOADING.ordinal();
+							Bundle bundle = new Bundle();
+							bundle.putLong("currentValue", bytes);
+							message.setData(bundle);
+							uploadingHander.sendMessage(message);
 						}
 
 					});
-		}else{
-			 simpleMultipartEntity = new SimpleMultipartEntity();
+		} else {
+			simpleMultipartEntity = new SimpleMultipartEntity();
 
 		}
-		
+
 		for (final Map.Entry<String, String[]> entry : addQueryString
 				.getParamMap().entrySet()) {
 			final String key = entry.getKey();

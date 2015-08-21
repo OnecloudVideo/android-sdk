@@ -1,6 +1,5 @@
 package com.pispower.video.sdk.catalog;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,82 +7,60 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.net.ParseException;
-import android.util.Log;
+import com.pispower.video.sdk.catalog.request.CatalogGetRequest;
+import com.pispower.video.sdk.catalog.request.CatalogListRequest;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 
-import com.pispower.video.sdk.net.BaseClient;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
+class ListTrait extends AbstractTrait {
 
-class ListTrait {
-	
-	private static final String Tag = ListTrait.class.getName();
+	public ListTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
+	}
 
-	public List<CatalogInfo> list() {
+	protected TraitResponseHandler getHandler() {
+		return new TraitResponseHandler() {
 
-		// 创建空的分类信息列表
-		List<CatalogInfo> catalogInfos = new ArrayList<CatalogInfo>();
-		try {
-			// 获取所有的分类
-			JSONArray catalogs = listJSON();
+			@Override
+			public Object handle(JSONObject jo) throws JSONException,
+					VideoSDKException {
+				// 创建空的分类信息列表
+				List<CatalogInfo> catalogInfos = new ArrayList<CatalogInfo>();
 
-			if (catalogs == null) {
+				// 获取所有的分类
+				JSONArray catalogs = jo.getJSONArray("catalogs");
+				if (catalogs == null) {
+					return catalogInfos;
+				}
+
+				for (int i = 0; i < catalogs.length(); i++) {
+
+					JSONObject catalog = catalogs.getJSONObject(i);
+					CatalogInfo catalogInfo = new CatalogInfo();
+					catalogInfo.setId(catalog.getString("id"));
+					catalogInfo.setName(catalog.getString("name"));
+
+					CatalogGetRequest getRequest = new CatalogGetRequest(
+							catalogInfo.getId());
+					GetTrait getTrait = new GetTrait(getAccessKey(),
+							getAccessSecret());
+
+					catalogInfo.setHoldVideoNums(getTrait.get(getRequest)
+							.getHoldVideoNums());
+
+					catalogInfos.add(catalogInfo);
+				}
+
 				return catalogInfos;
 			}
-
-			for (int i = 0; i < catalogs.length(); i++) {
-
-				JSONObject catalog = catalogs.getJSONObject(i);
-				CatalogInfo catalogInfo = new CatalogInfo();
-				catalogInfo.setId(catalog.getString("id"));
-				catalogInfo.setName(catalog.getString("name"));
-				catalogInfo.setHoldVideoNums(new GetTrait().get(catalogInfo.getId()).getHoldVideoNums());
-				
-				catalogInfos.add(catalogInfo);
-			}
-
-		} catch (Exception localException) {
-			Log.e(Tag, localException.getMessage());
-			return null;
-		}
-
-		Log.d(Tag, "list catalogs :" + catalogInfos);
-		return catalogInfos;
+		};
 	}
 
-	/**
-	 * 列出所有的分类
-	 * 
-	 * @return JSONArray 对象
-	 * @throws ParseException
-	 * @throws IOException
-	 * @throws JSONException
-	 * @throws HTTPJSONResponseValidException 
-	 */
-	private JSONArray listJSON() throws ParseException, IOException,
-			JSONException, HTTPJSONResponseValidException {
-		BaseClient client = this.getBaseClient();
-		final QueryString queryString = new QueryString();
-		final JSONObject json = client.get("/catalog/list.api", queryString);
-		if (json.length() == 0) {
-			Log.i(Tag, "JSONObject is empty");
-			return null;
-		}
-		int statusCode = (int) json.getInt("statusCode");
-		if (statusCode != 0) {
-			Log.i(Tag, "statusCode is not zero");
-			return null;
-		}
-		JSONArray catalogs = json.getJSONArray("catalogs");
-
-		if (catalogs.length() == 0) {
-			Log.i(Tag, "catalogs is empty");
-			return null;
-		}
-		return catalogs;
-	}
-
-	private BaseClient getBaseClient() {
-		return new BaseClient();
+	@SuppressWarnings("unchecked")
+	public List<CatalogInfo> list(CatalogListRequest req)
+			throws VideoSDKException {
+		return (List<CatalogInfo>) getHTTP("/catalog/list.api", req,
+				getHandler());
 	}
 }

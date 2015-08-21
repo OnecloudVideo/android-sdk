@@ -11,65 +11,68 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.net.ParseException;
-import android.util.Log;
 
-import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
+import com.pispower.video.sdk.video.request.VideoEmbedCodeRequest;
 
-class EmbedCodeTrait {
+class EmbedCodeTrait extends AbstractTrait {
 
-	private static final String TAG = EmbedCodeTrait.class.getName();
+	public EmbedCodeTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
+	}
 
 	/**
 	 * 获取指定视频指定的分配率的EmbedCode
 	 * 
-	 * @param videoId
-	 * @param clarity
+	 * @param parameterObject
+	 *            TODO
+	 * 
 	 * @return
 	 * @throws JSONException
 	 * @throws ParseException
 	 * @throws IOException
-	 * @throws org.apache.http.ParseException 
-	 * @throws HTTPJSONResponseValidException 
+	 * @throws org.apache.http.ParseException
+	 * @throws HTTPJSONResponseValidException
+	 * @throws VideoSDKException
 	 */
-	public Map<String, String> getVideoEmbedCode(String videoId, String clarity)
-			throws JSONException, ParseException, IOException, org.apache.http.ParseException, HTTPJSONResponseValidException {
-		Map<String, String> clarityUrlMap = new HashMap<String, String>();
+	@SuppressWarnings("unchecked")
+	public Map<String, String> getVideoEmbedCode(VideoEmbedCodeRequest req)
+			throws VideoSDKException {
 
-		BaseClient client = new BaseClient();
-		QueryString qs = new QueryString();
-		qs.addParam("videoId", videoId);
-		JSONObject jo;
+		return (Map<String, String>) getHTTP("/video/get.api", req,
+				new TraitResponseHandler() {
 
-		jo = client.get("/video/get.api", qs);
+					@Override
+					public Object handle(JSONObject jo) throws JSONException,
+							VideoSDKException {
+						Map<String, String> clarityUrlMap = new HashMap<String, String>();
+						JSONArray jsonArrayVideoCodes = jo
+								.getJSONArray("embedCodes");
+						int embedCodesNums = jsonArrayVideoCodes.length();
+						if (embedCodesNums == 0) {
+							logI("embedCodes is empty");
+							return clarityUrlMap;
+						}
 
-		if ((int) jo.getInt("statusCode") != 0) {
-			Log.i(TAG, "/video/get.api return statusCode is not zero");
-			return clarityUrlMap;
-		}
-		if (jo.length() == 0) {
-			Log.i(TAG, "/video/get.api return json is empty");
-			return clarityUrlMap;
-		}
-		JSONArray jsonArrayVideoCodes = jo.getJSONArray("embedCodes");
-		int embedCodesNums = jsonArrayVideoCodes.length();
-		if (embedCodesNums == 0) {
-			Log.i(TAG, "embedCodes is empty");
-			return clarityUrlMap;
-		}
+						for (int i = 0; i < embedCodesNums; i++) {
+							JSONObject embedCodeJO = jsonArrayVideoCodes
+									.getJSONObject(i);
+							String clarityName = embedCodeJO
+									.getString("clarity");
+							String android_IOS_embedCode = embedCodeJO
+									.getString("html5Code");
+							String remoteUrl = getUrlFromEmbedCode(android_IOS_embedCode);
+							clarityUrlMap.put(clarityName, remoteUrl);
+						}
 
-		for (int i = 0; i < embedCodesNums; i++) {
-			JSONObject embedCodeJO = jsonArrayVideoCodes.getJSONObject(i);
-			String clarityName = embedCodeJO.getString("clarity");
-			String android_IOS_embedCode = embedCodeJO.getString("html5Code");
-			String remoteUrl = getUrlFromEmbedCode(android_IOS_embedCode);
-			clarityUrlMap.put(clarityName, remoteUrl);
-		}
+						return clarityUrlMap;
+					}
+				});
 
-		return clarityUrlMap;
 	}
-
 
 	/**
 	 * 从EmbedCode中获得url

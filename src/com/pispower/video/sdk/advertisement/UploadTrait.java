@@ -9,11 +9,15 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.pispower.video.sdk.net.BaseClient;
+import com.pispower.video.sdk.core.AbstractTrait;
 import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
 import com.pispower.video.sdk.util.QueryString;
 
-class UploadTrait {
+class UploadTrait extends AbstractTrait {
+
+	public UploadTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
+	}
 
 	private static final String Tag = UploadTrait.class.getName();
 
@@ -33,8 +37,6 @@ class UploadTrait {
 	private JSONObject getResponseJson(File file, String name)
 			throws ParseException, HTTPJSONResponseValidException, IOException,
 			JSONException {
-
-		BaseClient client = new BaseClient();
 
 		QueryString qs = new QueryString();
 		if (null != name) {

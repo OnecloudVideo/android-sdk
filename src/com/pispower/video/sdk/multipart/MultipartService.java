@@ -1,8 +1,6 @@
 package com.pispower.video.sdk.multipart;
 
-import java.io.File;
-
-import android.os.Handler;
+import com.pispower.video.sdk.core.AccessPropertiesConfig;
 
 /**
  * 
@@ -10,10 +8,13 @@ import android.os.Handler;
  * @author kinghai
  *
  */
-public class MultipartService {
+public class MultipartService extends AccessPropertiesConfig {
 
-	public void upload(File uploadFile, File tempDir,
-			Handler handler, String curCatalogId) {
-		new UploadTrait(uploadFile, tempDir, handler, curCatalogId).upload();
+	public MultipartService(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
+	}
+
+	public void upload(MultipartUploadRequest req) {
+		new UploadTrait(getAccessKey(), getAccessSecret(), req).upload();
 	}
 }

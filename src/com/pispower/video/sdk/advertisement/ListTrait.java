@@ -1,56 +1,44 @@
 package com.pispower.video.sdk.advertisement;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import com.pispower.video.sdk.advertisement.request.AdvertisementListRequest;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 
-import com.pispower.video.sdk.net.BaseClient;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
+class ListTrait extends AbstractTrait {
 
-class ListTrait {
-
-	private static final String Tag = ListTrait.class.getName();
-
-	public List<Advertisement> list(String nameLike, int page, int maxResult) {
-
-		try {
-			List<Advertisement> advertisements = new ArrayList<>();
-			JSONArray jsonArray = getJsonObject(nameLike, page, maxResult)
-					.getJSONArray("ads");
-
-			AdvertisementCreator creator = new AdvertisementCreator();
-			for (int i = 0; i < jsonArray.length(); i++) {
-				JSONObject jo = jsonArray.getJSONObject(i);
-				advertisements.add(creator.create(jo));
-			}
-
-			return advertisements;
-
-		} catch (ParseException | IOException | JSONException
-				| HTTPJSONResponseValidException e) {
-			Log.e(Tag, e.getMessage());
-			return null;
-		}
+	public ListTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
 	}
 
-	private JSONObject getJsonObject(String nameLike, int page, int maxResult)
-			throws ParseException, IOException, JSONException,
-			HTTPJSONResponseValidException {
-		BaseClient client = new BaseClient();
+	@SuppressWarnings("unchecked")
+	public List<Advertisement> list(AdvertisementListRequest req)
+			throws VideoSDKException {
 
-		QueryString qs = new QueryString();
-		qs.addParam("nameLike", nameLike);
-		qs.addParam("page", "" + page);
-		qs.addParam("maxResult", "" + maxResult);
+		return (List<Advertisement>) getHTTP("/ad/list.api", req,
+				new TraitResponseHandler() {
 
-		return client.get("/ad/list.api", qs);
+					@Override
+					public Object handle(JSONObject jo) throws JSONException,
+							VideoSDKException {
+						List<Advertisement> advertisements = new ArrayList<>();
+						JSONArray jsonArray = jo.getJSONArray("ads");
+
+						AdvertisementCreator creator = new AdvertisementCreator();
+						for (int i = 0; i < jsonArray.length(); i++) {
+							JSONObject joItem = jsonArray.getJSONObject(i);
+							advertisements.add(creator.create(joItem));
+						}
+
+						return advertisements;
+					}
+				});
 	}
 }

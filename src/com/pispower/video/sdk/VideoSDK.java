@@ -2,6 +2,7 @@ package com.pispower.video.sdk;
 
 import com.pispower.video.sdk.advertisement.AdvertisementService;
 import com.pispower.video.sdk.catalog.CatalogService;
+import com.pispower.video.sdk.core.AccessPropertiesConfig;
 import com.pispower.video.sdk.multipart.MultipartService;
 import com.pispower.video.sdk.video.VideoService;
 
@@ -12,21 +13,25 @@ import com.pispower.video.sdk.video.VideoService;
  * @author ftguang
  *
  */
-public class VideoSDK {
+public class VideoSDK extends AccessPropertiesConfig {
 	
-	public static CatalogService getCatalogService() {
-		return new CatalogService();
-	}
-	
-	public static VideoService getVideoService() {
-		return new VideoService();
+	public VideoSDK(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
 	}
 
-	public static MultipartService getMultipartService() {
-		return new MultipartService();
+	public CatalogService getCatalogService() {
+		return new CatalogService(getAccessKey(), getAccessSecret());
 	}
 	
-	public static AdvertisementService getAdvertisementService() {
-		return new AdvertisementService();
+	public VideoService getVideoService() {
+		return new VideoService(getAccessKey(), getAccessSecret());
+	}
+
+	public MultipartService getMultipartService() {
+		return new MultipartService(getAccessKey(), getAccessSecret());
+	}
+	
+	public AdvertisementService getAdvertisementService() {
+		return new AdvertisementService(getAccessKey(), getAccessSecret());
 	}
 }

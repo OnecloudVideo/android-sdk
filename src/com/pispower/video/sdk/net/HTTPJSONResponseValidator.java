@@ -13,7 +13,7 @@ class HTTPJSONResponseValidator {
 			throws HTTPJSONResponseValidException {
 
 		if (0 == json.length()) {
-			Log.i(Tag, "return json is empty");
+			Log.e(Tag, "return json is empty");
 
 			throw new HTTPJSONResponseValidException("emtpy json");
 		}
@@ -22,11 +22,13 @@ class HTTPJSONResponseValidator {
 		try {
 			code = json.getInt("statusCode");
 		} catch (JSONException e) {
+			Log.e(Tag, "status code is missing");
+			
 			throw new HTTPJSONResponseValidException("illegal property");
 		}
 
 		if (0 != code) {
-			Log.i(Tag, "statusCode is not zero");
+			Log.e(Tag, "statusCode is not zero");
 
 			throw new HTTPJSONResponseValidException("error code " + code);
 		}

@@ -5,36 +5,27 @@
 
 package com.pispower.video.sdk.advertising;
 
-import android.util.Log;
-import com.pispower.video.sdk.advertising.Advertising;
-import com.pispower.video.sdk.advertising.AdvertisingCreator;
-import com.pispower.video.sdk.net.BaseClient;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
-import java.io.IOException;
-import java.text.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class GetTrait {
-    private static final String Tag = GetTrait.class.getName();
+import com.pispower.video.sdk.advertising.request.AdvertisingGetRequest;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 
-    GetTrait() {
-    }
+class GetTrait extends AbstractTrait {
 
-    public Advertising get(String id) {
-        try {
-            return (new AdvertisingCreator()).create(this.getResponseJsonObject(id));
-        } catch (JSONException | ParseException | HTTPJSONResponseValidException | IOException | org.apache.http.ParseException var3) {
-            Log.e(Tag, "get fail for", var3);
-            return null;
-        }
-    }
+	public GetTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
+	}
 
-    private JSONObject getResponseJsonObject(String id) throws org.apache.http.ParseException, HTTPJSONResponseValidException, IOException, JSONException {
-        BaseClient client = new BaseClient();
-        QueryString qs = new QueryString();
-        qs.addParam("id", id);
-        return client.get("/advertise/get.api", qs);
-    }
+	public Advertising get(AdvertisingGetRequest req) throws VideoSDKException {
+		return (Advertising) getHTTP("/advertise/get.api", req, new TraitResponseHandler() {
+			
+			@Override
+			public Object handle(JSONObject jo) throws JSONException, VideoSDKException {
+				return (new AdvertisingCreator()).create(jo);
+			}
+		});
+	}
 }

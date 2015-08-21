@@ -1,45 +1,29 @@
 package com.pispower.video.sdk.advertisement;
 
-import java.io.IOException;
-
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import com.pispower.video.sdk.advertisement.request.AdvertisementUpdateRequest;
+import com.pispower.video.sdk.core.AbstractTrait;
+import com.pispower.video.sdk.core.TraitResponseHandler;
+import com.pispower.video.sdk.core.VideoSDKException;
 
-import com.pispower.video.sdk.net.BaseClient;
-import com.pispower.video.sdk.net.HTTPJSONResponseValidException;
-import com.pispower.video.sdk.util.QueryString;
+class UpdateTrait extends AbstractTrait {
 
-class UpdateTrait {
-
-	private static final String Tag = UpdateTrait.class.getName();
-
-	public boolean update(String id, String name) {
-
-		try {
-			getJsonObject(id, name);
-
-			return true;
-
-		} catch (ParseException | HTTPJSONResponseValidException | IOException
-				| JSONException e) {
-
-			Log.e(Tag, "update fail", e);
-			return false;
-		}
+	public UpdateTrait(String accessKey, String accessSecret) {
+		super(accessKey, accessSecret);
 	}
 
-	private JSONObject getJsonObject(String id, String name)
-			throws ParseException, HTTPJSONResponseValidException, IOException,
-			JSONException {
-		BaseClient client = new BaseClient();
+	public String update(AdvertisementUpdateRequest req)
+			throws VideoSDKException {
+	 return (String) postHTTP("/ad/update.api", req,
+				new TraitResponseHandler() {
 
-		QueryString qs = new QueryString();
-		qs.addParam("id", id);
-		qs.addParam("name", name);
-
-		return client.post("/ad/update.api", qs);
+					@Override
+					public Object handle(JSONObject jo) throws JSONException,
+							VideoSDKException {
+						return jo.getString("message");
+					}
+				});
 	}
 }
